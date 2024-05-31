@@ -188,6 +188,7 @@ training_repition = 3
 neurons = [8,16,32,64,128,256]
 
 for i in range(training_repition):
+  print(f'Training Rep: {i}')
   for r_i in range(len(neurons)):
     print(f'Neurons: {neurons[r_i]}')
     best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter, dist_obs=False, dist_train=False, fc_neurons=neurons[r_i])
@@ -200,7 +201,7 @@ for i in range(training_repition):
     
     torch.save(best_policy_pid.state_dict(),f'best_policy_pid_{str(neurons[r_i])}_neurons_rep_{i}.pth')
 
-    best_policy_rl, r_list_rl, p_list_rl = training_loop(PID = False,max_iter = max_iter,dist_obs=False, dist_train=False)
+    best_policy_rl, r_list_rl, p_list_rl = training_loop(PID = False,max_iter = max_iter,dist_obs=False, dist_train=False,fc_neurons=neurons[r_i])
     
     results_rl_network[r_i] = {
         'r_list': r_list_rl,
