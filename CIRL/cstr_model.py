@@ -19,7 +19,7 @@ def PID_velocity(Ks,e,e_history,u_prev,ts,s_hist):
    
     # Cooling temp
     Tc = u_prev[-1][0] + KpCa*(e[0] - e_history[-1,0]) + (KpCa/KiCa)*e[0]*dt - KpCa*KdCa*(e[0]-2*e_history[-1,0]+e_history[-2,0])/dt
-    Tc = min(max(Tc,290),400) # Clamp between operational limits
+    Tc = min(max(Tc,290),450) # Clamp between operational limits
 
     # Flow in
     F = u_prev[-1][1] + KpF*(e[1] - e_history[-1,1]) + (KpF/KiF)*e[1]*dt - KpF*KdF*(e[1]-2*e_history[-1,1]+e_history[-2,1])/dt
@@ -29,7 +29,7 @@ def PID_velocity(Ks,e,e_history,u_prev,ts,s_hist):
     return u
 
 
-def cstr_CS1(x,t,u,Tf,Caf,k0,UA):
+def cstr_CS1(x,t,u,Tf,Caf):
     '''
     Dynamic model of cstr with volume and concentration control.
   
@@ -105,13 +105,14 @@ class reactor_class(gym.Env):
 
     
     # Setpoints
-    Ca_des1 = [0.70 for i in range(int(ns/3))] + [0.75 for i in range(int(ns/3))] + [0.8 for i in range(int(ns/3))]
+    Ca_des1 = [0.70 for i in range(int(ns/3))] + [0.75 for i in range(int(ns/3))] + [0.86 for i in range(int(ns/3))]
     Ca_des2 = [0.1 for i in range(int(ns/3))] + [0.2 for i in range(int(ns/3))] + [0.3 for i in range(int(ns/3))]
     Ca_des3 = [0.4 for i in range(int(ns/3))] + [0.5 for i in range(int(ns/3))] + [0.6 for i in range(int(ns/3))]
    
    
     
     if self.test:
+      # Ca_des1 = [0.075 for i in range(int(ns/3))] + [0.45 for i in range(int(ns/3))] + [0.9 for i in range(int(ns/3))] 
       Ca_des1 = [0.075 for i in range(int(ns/3))] + [0.45 for i in range(int(ns/3))] + [0.725 for i in range(int(ns/3))] 
     V_des = [100 for i in range(int(ns/3))] + [100 for i in range(int(ns/3))] + [100 for i in range(int(ns/3))] 
 
@@ -125,7 +126,8 @@ class reactor_class(gym.Env):
     self.Caf_dist = np.array([1.7,1.6,1.9]) 
 
     # Obs and action spaces
-    self.x_norm = np.array(([0,0,0.01,0,0,0.01,],[25,20,10,1,2,1])) # PID space
+    self.x_norm = np.array(([0,0,0.01,0,0,0.01,],[25,20,10,1,2,1])) 
+    # self.x_norm = np.array(([-5,0,0.01,-1,0,0.01,],[25,20,10,1,2,1])) # PID space
     self.observation_space = spaces.Box(low = np.array([0, 350,90,0, 350,90,0,99]),high= np.array([1,390,102,1,390,103,1,101]))#Cb,T,V,Cb,T,V,Ca_sp,V_sp
     if self.dist_obs:
       self.observation_space = spaces.Box(low = np.array([0, 350,90,0, 350,90,0,99,1]),high= np.array([1,390,102,1,390,103,1,101,2]))#Cb,T,V,Cb,T,V,Ca_sp,V_sp
@@ -197,7 +199,7 @@ class reactor_class(gym.Env):
        self.u_DS = action_policy
        self.info = {}
 
-    self.action = copy.deepcopy(action_policy)
+    self.action = action_policy
     Ca_des = self.SP[0][self.SP_i][0][self.i]
     V_des = self.SP[1][0][0][self.i]
     self.state, rew = self.reactor(self.state,self.action,Ca_des,V_des)
@@ -238,21 +240,25 @@ class reactor_class(gym.Env):
     e = np.zeros(2)
     e[0]  = x_sp[0] - state[1]
     e[1]  = x_sp[1] - state[4]
-      
-    Ks = copy.deepcopy(action) #Ca, T, u, Ca setpoint and T setpoint
+          
+
+    Ks = action #Ca, T, u, Ca setpoint and T setpoint
     
     if not self.DS and not self.normRL:
       try:
-        Ks_norm = ((Ks + 1) / 2) * (self.x_norm[1] - self.x_norm[0]) + self.x_norm[0]
+        
+        Ks_norm = ((Ks.detach().numpy() + 1) / 2) * (self.x_norm[1] - self.x_norm[0]) + self.x_norm[0]
+        
       except Exception:
-        Ks_norm = ((Ks[0] + 1) / 2) * (self.x_norm[1] - self.x_norm[0]) + self.x_norm[0]
+        
+        Ks_norm = ((Ks + 1) / 2) * (self.x_norm[1] - self.x_norm[0]) + self.x_norm[0]
 
       self.info = {'Ks':Ks_norm}
-
-      if self.PID_vel:
-        if self.i < 2:
+      
+      
+      if self.i < 2:
           u = np.array([302,99])
-        else:
+      else:
           u =  PID_velocity(Ks_norm,e,np.array(self.e_history),self.u_history,self.ts,np.array(self.s_history))
     if self.DS:
       u = self.u_DS
@@ -276,7 +282,7 @@ class reactor_class(gym.Env):
       else:
         self.Caf = 1.75
     
-    y       = odeint(cstr_CS1,state[0:5],self.ts,args=(u,self.Tf,self.Caf,k0,UA))
+    y       = odeint(cstr_CS1,state[0:5],self.ts,args=(u,self.Tf,self.Caf))
 
     # add measurement noise
     Ca_plus = y[-1][0] + np.random.uniform(low=-0.001,high=0.001)

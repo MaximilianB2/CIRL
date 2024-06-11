@@ -76,9 +76,8 @@ def training_loop(PID, max_iter, dist_train, dist_obs, prev_policy=None):
         PID=True,
     )
     env = reactor_class(
-        test=False,
+        test=True,
         ns=120,
-        PID_vel=True,
         normRL=normRL,
         dist=dist_train,
         dist_obs=dist_obs,
@@ -99,7 +98,7 @@ def training_loop(PID, max_iter, dist_train, dist_obs, prev_policy=None):
         evals_rs = 1
     params = policy.state_dict()
     # Random Search
-    max_param = 0.05  # SP 0.01
+    max_param = 0.1  # SP 0.01
     min_param = max_param * -1
     print("Random search to find good initial policy...")
     for policy_i in range(evals_rs):
@@ -163,38 +162,38 @@ def training_loop(PID, max_iter, dist_train, dist_obs, prev_policy=None):
     return best_policy, r_list_save, p_list_save
 
 
-max_iter = 150
-training_reps = 3
-# r_pid = []
-r_rl = []
-# p_pid = []
-p_rl = []
+max_iter = 75
+training_reps = 1
+r_pid = []
+# r_rl = []
+p_pid = []
+# p_rl = []
 
 for r_i in range(training_reps):
     print(f"Training repition: {r_i +1}")
-    #   best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter, dist_obs=False, dist_train=False)
-    #   r_pid.append(r_list_pid)
-    #   p_pid.append(p_list_pid)
-    #   torch.save(best_policy_pid.state_dict(),'best_policy_pid_wnoise.pth')
+    best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter, dist_obs=False, dist_train=False)
+    r_pid.append(r_list_pid)
+    p_pid.append(p_list_pid)
+    torch.save(best_policy_pid.state_dict(),'best_policy_pid_unstable.pth')
     #   # np.save('rewards_PID.npy',r_list_pid)
 
-    best_policy_rl, r_list_rl, p_list_rl = training_loop(
-        PID=False, max_iter=max_iter, dist_obs=False, dist_train=False
-    )
+    # best_policy_rl, r_list_rl, p_list_rl = training_loop(
+    #     PID=False, max_iter=max_iter, dist_obs=False, dist_train=False
+    # )
 
-    r_rl.append(r_list_rl)
+    # r_rl.append(r_list_rl)
 
-    p_rl.append(p_list_rl)
+    # p_rl.append(p_list_rl)
     #   # np.save('rewards_rl.npy',r_list_rl,)
-    torch.save(best_policy_rl.state_dict(), "best_policy_rl_wnoise.pth")
+    # torch.save(best_policy_rl.state_dict(), "best_policy_rl_wnoise.pth")
 
 
-# with open('r_pid.pkl', 'wb') as f:
-#     pickle.dump(r_pid, f)
-with open("r_rl.pkl", "wb") as f:
-    pickle.dump(r_rl, f)
-with open("p_rl.pkl", "wb") as f:
-    pickle.dump(p_rl, f)
+# # with open('r_pid.pkl', 'wb') as f:
+# #     pickle.dump(r_pid, f)
+# with open("r_rl.pkl", "wb") as f:
+#     pickle.dump(r_rl, f)
+# with open("p_rl.pkl", "wb") as f:
+#     pickle.dump(p_rl, f)
 # with open('p_pid.pkl', 'wb') as f:
 #     pickle.dump(p_pid, f)
 # plt.figure()
@@ -204,33 +203,33 @@ with open("p_rl.pkl", "wb") as f:
 # plt.show()
 
 # # # Train with disturbance not observed
-# # r_pid_dist_nonobs = []
-# r_rl_dist_nonobs = []
-# # p_pid_dist_nonobs = []
-# p_rl_dist_nonobs = []
+# r_pid_dist_nonobs = []
+# # r_rl_dist_nonobs = []
+# p_pid_dist_nonobs = []
+# # p_rl_dist_nonobs = []
 # for r_i in range(training_reps):
-# #   print(f'Training repition: {r_i +1}')
-# # #   print('PID with no disturbance observation')
-# # #   best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter,dist_train=True,dist_obs=False)
-# # #   r_pid_dist_nonobs.append(r_list_pid)
-# # #   p_pid_dist_nonobs.append(p_list_pid)
-# # #   torch.save(best_policy_pid.state_dict(),'best_policy_pid_dist.pth')
-# # # #   # np.save('rewards_PID.npy',r_list_pid)
+#   print(f'Training repition: {r_i +1}')
+# #   print('PID with no disturbance observation')
+#   best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter,dist_train=True,dist_obs=False)
+#   r_pid_dist_nonobs.append(r_list_pid)
+#   p_pid_dist_nonobs.append(p_list_pid)
+#   torch.save(best_policy_pid.state_dict(),'best_policy_pid_dist.pth')
+# #   # np.save('rewards_PID.npy',r_list_pid)
 
-# best_policy_rl, r_list_rl, p_list_rl = training_loop(PID = False,max_iter = max_iter,dist_train=True,dist_obs=False)
-# r_rl_dist_nonobs.append(r_list_rl)
-# p_rl_dist_nonobs.append(p_list_rl)
-# # np.save('rewards_rl.npy',r_list_rl,)
-# torch.save(best_policy_rl.state_dict(),'best_policy_rl_dist.pth')
+# # best_policy_rl, r_list_rl, p_list_rl = training_loop(PID = False,max_iter = max_iter,dist_train=True,dist_obs=False)
+# # r_rl_dist_nonobs.append(r_list_rl)
+# # p_rl_dist_nonobs.append(p_list_rl)
+# # # np.save('rewards_rl.npy',r_list_rl,)
+# # torch.save(best_policy_rl.state_dict(),'best_policy_rl_dist.pth')
 
-# # # with open('r_pid_dist_nonobs.pkl', 'wb') as f:
-# # #     pickle.dump(r_pid_dist_nonobs, f)
-# with open('r_rl_dist_nonobs.pkl', 'wb') as f:
-#     pickle.dump(r_rl_dist_nonobs, f)
-# with open('p_rl_dist_nonobs.pkl', 'wb') as f:
-#     pickle.dump(p_rl_dist_nonobs, f)
-# # # with open('p_pid_dist_nonobs.pkl', 'wb') as f:
-# # #     pickle.dump(p_pid_dist_nonobs, f)
+# with open('r_pid_dist_nonobs.pkl', 'wb') as f:
+#     pickle.dump(r_pid_dist_nonobs, f)
+# # with open('r_rl_dist_nonobs.pkl', 'wb') as f:
+# #     pickle.dump(r_rl_dist_nonobs, f)
+# # with open('p_rl_dist_nonobs.pkl', 'wb') as f:
+# #     pickle.dump(p_rl_dist_nonobs, f)
+# with open('p_pid_dist_nonobs.pkl', 'wb') as f:
+#     pickle.dump(p_pid_dist_nonobs, f)
 
 # # # # Train with disturbance observed
 # # r_pid_dist_obs = []

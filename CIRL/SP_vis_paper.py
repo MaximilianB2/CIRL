@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from CS1_Model import reactor_class
+from cstr_model import reactor_class
 import torch
 import torch.nn.functional as F
-
+from cirl_policy import Net as cirl_net
+from stable_baselines3 import PPO
+import pickle
 ns = 120
 reps = 10
 
@@ -93,7 +95,10 @@ def rollout(env, best_policy, PID, PG=False, ES=False):
             a_policy = best_policy
         x_norm = env.x_norm
         if PID:
-            Ks_norm = ((a_policy + 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
+            try:
+                Ks_norm = ((a_policy + 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
+            except:
+                Ks_norm = ((a_policy.detach().numpy()+ 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
             ks_eval_EA[:, 0, r_i] = Ks_norm
         r_tot = 0
         for i in range(1, ns):
@@ -106,7 +111,10 @@ def rollout(env, best_policy, PID, PG=False, ES=False):
             else:
                 a_policy = best_policy
             if PID:
-                Ks_norm = ((a_policy + 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
+                try:
+                    Ks_norm = ((a_policy + 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
+                except:
+                    Ks_norm = ((a_policy.detach().numpy()+ 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
                 ks_eval_EA[:, i, r_i] = Ks_norm
             s_norm, r, done, info, _ = env.step(a_policy)
 
@@ -599,7 +607,13 @@ def plot_simulation_comp(
     plt.show()
 
 
-env = reactor_class(test=True, ns=120, PID_vel=True, normRL=True)
+env = reactor_class(test=True, ns=120, normRL=True)
+
+with open('results_rl_network_rep_0 (1).pkl', 'rb') as f:
+
+    inter = pickle.load(f)
+    # print(len(inter[4]['p_list']))
+    best_policy_rl_sd = inter[4]['p_list'][149]
 best_policy_rl = Net(
     n_fc1=128,
     n_fc2=128,
@@ -609,28 +623,33 @@ best_policy_rl = Net(
     PID=True,
     deterministic=True,
 )
-best_policy_rl.load_state_dict(torch.load("best_policy_rl_wnoise_2005.pth"))
+best_policy_rl.load_state_dict(best_policy_rl_sd)
 Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
     env, best_policy_rl, PID=False, ES=True
 )
+best_policy_pid_sd = torch.load('best_policy_pid_unstable.pth')
+with open('results_pid_network_rep_0.pkl', 'rb') as f:
 
+    inter = pickle.load(f)
+    best_policy_pid_sd = inter[1]['p_list'][74]
 
-env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
-best_policy_pid = Net(
-    n_fc1=128,
-    n_fc2=128,
+env = reactor_class(test=True, ns=120,  normRL=False)
+best_policy_pid =Net(
+    n_fc1=16,
+    n_fc2=16,
     activation=torch.nn.ReLU,
     n_layers=1,
     output_sz=6,
+    input_sz=8,
     PID=True,
     deterministic=True,
 )
-best_policy_pid.load_state_dict(torch.load("best_policy_pid_wnoise.pth"))
+best_policy_pid.load_state_dict(best_policy_pid_sd)
 Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
     env, best_policy_pid, PID=True, ES=True
 )
 
-env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
+env = reactor_class(test=True, ns=120,  normRL=False)
 best_policy_const_PID = np.load("constant_gains.npy")
 (
     Ca_eval_PID_const,
@@ -641,9 +660,9 @@ best_policy_const_PID = np.load("constant_gains.npy")
     ks_eval_pid_const,
 ) = rollout(env, best_policy_const_PID, PID=True, PG=False)
 
-# env = reactor_class(test = True, ns = 120, PID_vel= True, normRL=True)
-# best_policy_PG_normRL = SAC.load('SAC_normRL_1604.zip')
-# Ca_eval_normRL_PG,T_eval_normRL_PG,V_eval_normRL_PG,Tc_eval_normRL_PG,F_eval_normRL_PG = rollout(env,best_policy_PG_normRL,PID=False,PG=True)
+# env = reactor_class(test = True, ns = 120, normRL=False)
+# best_policy_PG_normRL = PPO.load('PPO_PID_3105_rep_0.zip')
+# x = rollout(env,best_policy_PG_normRL,PID=True,PG=True)
 
 SP = env.test_SP
 plot_simulation_comp(

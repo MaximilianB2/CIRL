@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-from CS1_Model import reactor_class
+from cstr_model import reactor_class
 from torch_pso import ParticleSwarmOptimizer
 import copy
 import numpy as np
@@ -105,7 +105,7 @@ def training_loop(PID,max_iter,dist_train, dist_obs,prev_policy = None, fc_neuro
      initialise = True
  
   policy = Net(n_fc1 = fc_neurons,n_fc2 = fc_neurons,activation = torch.nn.ReLU,output_sz=output_sz,n_layers = 1,input_sz=input_sz,PID=True)
-  env = reactor_class(test = False, ns = 120, PID_vel= True, normRL=normRL,dist = dist_train, dist_obs=dist_obs, dist_train=dist_train)
+  env = reactor_class(test = False, ns = 120,  normRL=normRL,dist = dist_train, dist_obs=dist_obs, dist_train=dist_train)
   #Training Loop Parameters
   new_swarm = 0
   best_reward = 1e8
