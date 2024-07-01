@@ -229,7 +229,10 @@ def rollout(env, best_policy, PID, PG=False):
             if PID:
                 Ks_norm = ((a_policy.detach().numpy()+ 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
                 ks_eval_EA[:, i, r_i] = Ks_norm
-            s_norm, r, done, info, _ = env.step(a_policy)
+            try:
+                s_norm, r, done, info, _ = env.step(a_policy)
+            except:
+                s_norm, r, done, info, _ = env.step(a_policy.detach().numpy())
             r_tot += r
             s = (
                 s_norm * (env.observation_space.high - env.observation_space.low)
@@ -402,13 +405,13 @@ def plot_simulation_comp(
 
 
 env = reactor_class(test=True, ns=120,  normRL=True, dist=True)
-best_policy_rl = Net(
+best_policy_rl = cirl_net(
     n_fc1=128,
     n_fc2=128,
     activation=torch.nn.ReLU,
     n_layers=1,
     output_sz=2,
-    input_sz=8,
+    input_sz=15,
     deterministic=True,
     PID=True,
 )
@@ -425,7 +428,7 @@ best_policy_pid = cirl_net(
     activation=torch.nn.ReLU,
     n_layers=1,
     output_sz=6,
-    input_sz=8,
+    input_sz=15,
     deterministic=True,
     PID=True,
 )

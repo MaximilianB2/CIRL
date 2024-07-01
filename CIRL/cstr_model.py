@@ -128,7 +128,7 @@ class reactor_class(gym.Env):
     # Obs and action spaces
     self.x_norm = np.array(([0,0,0.01,0,0,0.01,],[25,20,10,1,2,1])) 
     # self.x_norm = np.array(([-5,0,0.01,-1,0,0.01,],[25,20,10,1,2,1])) # PID space
-    self.observation_space = spaces.Box(low = np.array([0, 350,90,0, 350,90,0,99]),high= np.array([1,390,102,1,390,103,1,101]))#Cb,T,V,Cb,T,V,Ca_sp,V_sp
+    self.observation_space = spaces.Box(low = np.array([0, 350,90,0, 350,90,0, 350,90,0,99,0,99,0,99]),high= np.array([1,390, 102,1,390,102,1,390,102,1,101,1,101,1,101]))#Cb,T,V,Cb,T,V,Ca_sp,V_sp
     if self.dist_obs:
       self.observation_space = spaces.Box(low = np.array([0, 350,90,0, 350,90,0,99,1]),high= np.array([1,390,102,1,390,103,1,101,2]))#Cb,T,V,Cb,T,V,Ca_sp,V_sp
     if self.normRL:
@@ -170,7 +170,7 @@ class reactor_class(gym.Env):
     self.Caf = 1
     Ca_des = self.SP[0][self.SP_i][0][0]
     V_des = self.SP[1][0][0][0]
-    self.state = np.array([self.Ca_ss,0,0,self.T_ss,self.V_ss,self.Ca_ss,0,0,self.T_ss,self.V_ss,Ca_des,V_des])
+    self.state = np.array([self.Ca_ss,0,0,self.T_ss,self.V_ss,self.Ca_ss,0,0,self.T_ss,self.V_ss,self.Ca_ss,0,0,self.T_ss,self.V_ss,Ca_des,V_des,Ca_des,V_des,Ca_des,V_des])
     self.done = False
 
 
@@ -182,7 +182,7 @@ class reactor_class(gym.Env):
     self.s_history = []
 
     self.ts = [self.t[self.i],self.t[self.i+1]]
-    self.RL_state = [self.state[i] for i in [1,3,4,6,8,9,10,11]]
+    self.RL_state = [self.state[i] for i in [1,3,4,6,8,9,11,13,14,15,16,17,18,19,20]]
     
     if self.dist_obs:
       self.RL_state.append(self.Caf)   
@@ -214,13 +214,13 @@ class reactor_class(gym.Env):
           self.i = 0
           Ca_des = self.SP[0][self.SP_i][0][0]
           V_des = self.SP[1][0][0][0]
-          self.state = np.array([self.Ca_ss,0,0,self.T_ss,self.V_ss,self.Ca_ss,0,0,self.T_ss,self.V_ss,Ca_des,V_des])
+          self.state = np.array([self.Ca_ss,0,0,self.T_ss,self.V_ss,self.Ca_ss,0,0,self.T_ss,self.V_ss,self.Ca_ss,0,0,self.T_ss,self.V_ss,Ca_des,V_des,Ca_des,V_des,Ca_des,V_des])
           self.u_history = []
           self.e_history = []
         else:
           self.done = True
 
-    self.RL_state = [self.state[i] for i in [1,3,4,6,8,9,10,11]]
+    self.RL_state = [self.state[i] for i in [1,3,4,6,8,9,11,13,14,15,16,17,18,19,20]]
     if self.dist_obs:
       self.RL_state.append(self.Caf)   
     self.state_norm = (self.RL_state - self.observation_space.low)/(self.observation_space.high - self.observation_space.low)
@@ -292,19 +292,52 @@ class reactor_class(gym.Env):
     V_plus = y[-1][4]  + np.random.uniform(low=-.01,high=0.01)
 
     # collect data
-    state_plus = np.zeros(12)
-    state_plus[0]   = Ca_plus
-    state_plus[1]   = Cb_plus
-    state_plus[2]   = Cc_plus
-    state_plus[3]   = T_plus
-    state_plus[4] = V_plus
-    state_plus[5]   = Ca
-    state_plus[6]   = Cb
-    state_plus[7]   = Cc
-    state_plus[8]   = T
-    state_plus[9]   = V
-    state_plus[10]   = Ca_des
-    state_plus[11]  = V_des
+    if self.i < 2:
+      state_plus = np.zeros(21)
+      state_plus[0]   = Ca_plus
+      state_plus[1]   = Cb_plus
+      state_plus[2]   = Cc_plus
+      state_plus[3]   = T_plus
+      state_plus[4] = V_plus
+      state_plus[5]   = Ca
+      state_plus[6]   = Cb
+      state_plus[7]   = Cc
+      state_plus[8]   = T
+      state_plus[9]   = V
+      state_plus[10]   = Ca
+      state_plus[11]   = Cb
+      state_plus[12]   = Cc
+      state_plus[13]   = T
+      state_plus[14]   = V
+      state_plus[15]   = Ca_des
+      state_plus[16]  = V_des
+      state_plus[17]   = Ca_des
+      state_plus[18]  = V_des
+      state_plus[19]   = Ca_des
+      state_plus[20]  = V_des
+    else:
+      state_plus = np.zeros(21)
+      state_plus[0]   = Ca_plus
+      state_plus[1]   = Cb_plus
+      state_plus[2]   = Cc_plus
+      state_plus[3]   = T_plus
+      state_plus[4] = V_plus
+      state_plus[5]   = Ca
+      state_plus[6]   = Cb
+      state_plus[7]   = Cc
+      state_plus[8]   = T
+      state_plus[9]   = V
+      state_plus[10]   = self.s_history[-1][0]
+      state_plus[11]   = self.s_history[-1][1]
+      state_plus[12]   = self.s_history[-1][2]
+      state_plus[13]   = self.s_history[-1][3]
+      state_plus[14]   = self.s_history[-1][4]
+      state_plus[15]   = Ca_des
+      state_plus[16]  = V_des
+      state_plus[17]   = self.s_history[-1][15]
+      state_plus[18]  = self.s_history[-1][16]
+      state_plus[19]   = self.s_history[-2][15]
+      state_plus[20]  = self.s_history[-2][16]
 
 
     self.e_history.append((e))
@@ -315,12 +348,11 @@ class reactor_class(gym.Env):
     
    
     self.u_history.append(u)
-    self.s_history.append(state[0:2])
+    self.s_history.append(state)
     
     r_x = 0
     r_x = (e[0])**2
     r_x +=(e[1])**2 / 10
     r_x += 0.0005*u_cha[0] + 0.005*u_cha[1]
- 
-    
+
     return state_plus, r_x

@@ -31,7 +31,7 @@ class Net(torch.nn.Module):
         self.use_cuda = torch.cuda.is_available()
         self.device = torch.device("cpu")
         self.pid = PID
-        self.input_size = 8  # State size: Ca, T,Ca-,T- , Ca setpoint
+        self.input_size = 15  # State size: Ca, T,Ca-,T- , Ca setpoint
         self.output_sz = output_sz  # Output size: Reactor Ks size
         self.n_layers = torch.nn.ModuleList()
         self.hs1 = n_fc1  # !! parameters
@@ -116,8 +116,10 @@ def rollout(env, best_policy, PID, PG=False, ES=False):
                 except:
                     Ks_norm = ((a_policy.detach().numpy()+ 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
                 ks_eval_EA[:, i, r_i] = Ks_norm
-            s_norm, r, done, info, _ = env.step(a_policy)
-
+            try:
+                s_norm, r, done, info, _ = env.step(a_policy)
+            except:
+                s_norm, r, done, info, _ = env.step(a_policy.detach().numpy())
             r_tot += r
             s = (
                 s_norm * (env.observation_space.high - env.observation_space.low)
@@ -167,7 +169,7 @@ def plot_simulation_comp(
     plt.rcParams["font.size"] = 16
     t = np.linspace(0, 25, ns)
     fig, axs = plt.subplots(1, 4, figsize=(22, 5))
-    labels = ["$k_p$", "$k_i$", "$k_d$", "$k_p$", "$k_i$", "$k_d$"]
+    labels = ["$k_p$", r"$\tau_i$", r"$\tau_d$", "$k_p$", r"$\tau_i$", r"$\tau_d$"]
     col = ["tab:orange", "tab:red", "tab:blue", "tab:orange", "tab:red", "tab:blue"]
     col_fill = [
         "tab:orange",
@@ -608,17 +610,18 @@ def plot_simulation_comp(
 
 
 env = reactor_class(test=True, ns=120, normRL=True)
+best_policy_rl_sd = torch.load("best_policy_rl.pth")
+# with open('results_rl_network_rep_0 (1).pkl', 'rb') as f:
 
-with open('results_rl_network_rep_0 (1).pkl', 'rb') as f:
-
-    inter = pickle.load(f)
-    # print(len(inter[4]['p_list']))
-    best_policy_rl_sd = inter[4]['p_list'][149]
-best_policy_rl = Net(
+#     inter = pickle.load(f)
+#     # print(len(inter[4]['p_list']))
+#     best_policy_rl_sd = inter[4]['p_list'][149]
+best_policy_rl = cirl_net(
     n_fc1=128,
     n_fc2=128,
     activation=torch.nn.ReLU,
     n_layers=1,
+    input_sz=15,
     output_sz=2,
     PID=True,
     deterministic=True,
@@ -628,19 +631,19 @@ Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
     env, best_policy_rl, PID=False, ES=True
 )
 best_policy_pid_sd = torch.load('best_policy_pid_unstable.pth')
-with open('results_pid_network_rep_0.pkl', 'rb') as f:
+# with open('results_pid_network_rep_0.pkl', 'rb') as f:
 
-    inter = pickle.load(f)
-    best_policy_pid_sd = inter[1]['p_list'][74]
+#     inter = pickle.load(f)
+#     best_policy_pid_sd = inter[1]['p_list'][74]
 
 env = reactor_class(test=True, ns=120,  normRL=False)
-best_policy_pid =Net(
+best_policy_pid = cirl_net(
     n_fc1=16,
     n_fc2=16,
     activation=torch.nn.ReLU,
     n_layers=1,
     output_sz=6,
-    input_sz=8,
+    input_sz=15,
     PID=True,
     deterministic=True,
 )
