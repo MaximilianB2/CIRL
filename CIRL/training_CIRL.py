@@ -76,7 +76,7 @@ def training_loop(PID, max_iter, dist_train, dist_obs, prev_policy=None):
         PID=True,
     )
     env = reactor_class(
-        test=True,
+        test=False,
         ns=120,
         normRL=normRL,
         dist=dist_train,
@@ -98,7 +98,7 @@ def training_loop(PID, max_iter, dist_train, dist_obs, prev_policy=None):
         evals_rs = 1
     params = policy.state_dict()
     # Random Search
-    max_param = 0.2  # SP 0.01
+    max_param = 0.1  # SP 0.01
     min_param = max_param * -1
     print("Random search to find good initial policy...")
     for policy_i in range(evals_rs):
@@ -169,23 +169,23 @@ r_rl = []
 p_pid = []
 p_rl = []
 
-# for r_i in range(training_reps):
-#     # print(f"Training repition: {r_i +1}")
-#     best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter, dist_obs=False, dist_train=False)
-#     r_pid.append(r_list_pid)
-#     p_pid.append(p_list_pid)
-#     # torch.save(best_policy_pid.state_dict(),'best_policy_pid_unstable.pth')
-#     # np.save('rewards_PID.npy',r_list_pid)
+for r_i in range(training_reps):
+    # print(f"Training repition: {r_i +1}")
+    # best_policy_pid, r_list_pid, p_list_pid = training_loop(PID = True,max_iter = max_iter, dist_obs=False, dist_train=False)
+    # r_pid.append(r_list_pid)
+    # p_pid.append(p_list_pid)
+    # torch.save(best_policy_pid.state_dict(),'best_policy_pid_unstable.pth')
+    # np.save('rewards_PID.npy',r_list_pid)
 
-#     best_policy_rl, r_list_rl, p_list_rl = training_loop(
-#         PID=False, max_iter=max_iter, dist_obs=False, dist_train=False
-#     )
+    best_policy_rl, r_list_rl, p_list_rl = training_loop(
+        PID=False, max_iter=max_iter, dist_obs=False, dist_train=False
+    )
 
-#     r_rl.append(r_list_rl)
+    r_rl.append(r_list_rl)
 
-#     p_rl.append(p_list_rl)
-#     #   # np.save('rewards_rl.npy',r_list_rl,)
-#     # torch.save(best_policy_rl.state_dict(), "best_policy_rl.pth")
+    p_rl.append(p_list_rl)
+    #   # np.save('rewards_rl.npy',r_list_rl,)
+    torch.save(best_policy_rl.state_dict(), "best_policy_rl.pth")
 
 
 # with open('r_pid.pkl', 'wb') as f:

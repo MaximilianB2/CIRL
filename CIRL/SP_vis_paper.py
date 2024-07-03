@@ -610,13 +610,13 @@ def plot_simulation_comp(
 
 
 env = reactor_class(test=True, ns=120, normRL=True)
-best_policy_rl_sd = torch.load("best_policy_rl.pth")
-# with open('results_rl_network_rep_0 (1).pkl', 'rb') as f:
+# best_policy_rl_sd = torch.load("best_policy_rl.pth")
+with open('results_rl_network_rep_newobs_0.pkl', 'rb') as f:
 
-#     inter = pickle.load(f)
-#     # print(len(inter[4]['p_list']))
-#     best_policy_rl_sd = inter[4]['p_list'][149]
-best_policy_rl = cirl_net(
+    inter = pickle.load(f)
+    # print(len(inter[4]['p_list']))
+    best_policy_rl_sd = inter[1]['p_list'][149]
+best_policy_rl = Net(
     n_fc1=128,
     n_fc2=128,
     activation=torch.nn.ReLU,
@@ -630,20 +630,20 @@ best_policy_rl.load_state_dict(best_policy_rl_sd)
 Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
     env, best_policy_rl, PID=False, ES=True
 )
-best_policy_pid_sd = torch.load('best_policy_pid_unstable.pth')
-# with open('results_pid_network_rep_0.pkl', 'rb') as f:
+# best_policy_pid_sd = torch.load('best_policy_pid_unstable.pth')
+with open('results_pid_network_rep_newobs_1.pkl', 'rb') as f:
 
-#     inter = pickle.load(f)
-#     best_policy_pid_sd = inter[1]['p_list'][74]
+    inter = pickle.load(f)
+    best_policy_pid_sd = inter[0]['p_list'][149]
 
 env = reactor_class(test=True, ns=120,  normRL=False)
-best_policy_pid = cirl_net(
+best_policy_pid = Net(
     n_fc1=16,
     n_fc2=16,
     activation=torch.nn.ReLU,
     n_layers=1,
     output_sz=6,
-    input_sz=15,
+    # input_sz=15,
     PID=True,
     deterministic=True,
 )
