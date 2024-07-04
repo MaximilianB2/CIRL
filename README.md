@@ -4,7 +4,7 @@ This repository contains the code used in the paper title "Control-Informed Rein
 
 
 <p align="center">
-  <img src="./plots/RL-PID Diagram.png" width="50%">
+  <img src="./plots/RL-PID Diagram.png" width="70%">
 </P>
 
 ## Abstract
