@@ -1,9 +1,9 @@
 # CIRL: Integrating PID Controllers into the deep reinforcement learning framework.
-<p align="center">
+<p align="left">
       <a href="https://github.com/astral-sh/ruff">
         <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" /></a>
 </p>
-This repository contains the code used in the paper title "Control-Informed Reinforcement Learning: Integrating PID Controllers and Deep Reinforcement Learning" by Maximilian Bloor, Akhil Ahmed, Niki Kotecha, Mehmet Mercangöz, Calvin Tsay, Ehecatl Antonio Del Rio Chanona.
+This repository contains the code used in the paper titled "Control-Informed Reinforcement Learning: Integrating PID Controllers and Deep Reinforcement Learning" by Maximilian Bloor, Akhil Ahmed, Niki Kotecha, Mehmet Mercangöz, Calvin Tsay, Ehecatl Antonio Del Rio Chanona.
 
 
 <p align="center">
