@@ -3,11 +3,9 @@ import pickle
 import numpy as np
 import pandas as pd
 
-
 if __name__ == '__main__':
-    reps = 5
+    reps = 10
     results_pid_network = []
-    # Load network size analysis data
     for i in range(reps):
         with open(f"results_pid_network_rep_newobs_{i}.pkl", "rb") as f:
             inter = pickle.load(f)
@@ -16,7 +14,6 @@ if __name__ == '__main__':
                 r = [-1 * i for i in np.concatenate(inter[d]["r_list"]).tolist()]
                 r_list_values.append(r)
         results_pid_network.append(r_list_values)
-
 
     median_net_i = []
     max_net_i = []
@@ -31,7 +28,6 @@ if __name__ == '__main__':
 
 
 
-
     neurons = [16, 128]
     x_values = np.linspace(0, 2355, 2355)[::6]
     median_values_all = [median_net_i[i][::6] for i in range(len(median_net_i))]
@@ -40,7 +36,7 @@ if __name__ == '__main__':
 
 
     results_rl_network = []
-    for i in range(reps):
+    for i in range(10):
         with open(f"results_rl_network_rep_newobs_{i}.pkl", "rb") as f:
             inter = pickle.load(f)
             r_list_values = []
@@ -63,12 +59,14 @@ if __name__ == '__main__':
 
 
 
-    x_values = np.linspace(0, 2355, 468)
 
     neurons = [16, 128]
+    x_values = np.linspace(0, 2355, 468)
+
+
     window_size = 10  # Define the size of the sliding window
 
-    # Convert lists to pandas Series for rolling window calculation
+
     median_values_all = [
         pd.Series(median_net_i[i])
         .rolling(window=window_size)
@@ -107,44 +105,45 @@ if __name__ == '__main__':
         for i in range(len(max_net_i_rl))
     ]
     # print(median_values_all_rl)
+
     plt.figure(figsize=(8, 8))
     plt.rcParams["text.usetex"] = "True"
     plt.rcParams["font.family"] = "serif"
     plt.rcParams["font.size"] = 16
     col = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:olive"]
     for i, n_i in enumerate(neurons):
-        if i == 0 or i == 1:
+        if i == 0:
             plt.plot(
-                x_values, median_values_all[i], label=f"CIRL ({str(n_i)})", color=col[i]
+                x_values, median_values_all[i], label=f"CIRL ({str(n_i)})", color="tab:blue"
             )
             plt.fill_between(
                 x_values,
                 min_values_all[i],
                 max_values_all[i],
                 alpha=0.2,
-                color=col[i],
+                color="tab:blue",
                 edgecolor="none",
             )
+        if i == 1:
             plt.plot(
-                x_values,
-                median_values_all_rl[i],
-                label=f"RL ({str(n_i)})",
-                color=col[i],
-                linestyle="dashed",
+                x_values, median_values_all_rl[i], label=f"RL ({str(n_i)})", color="tab:red"
             )
             plt.fill_between(
                 x_values,
                 min_values_all_rl[i],
                 max_values_all_rl[i],
                 alpha=0.2,
-                color=col[i],
+                color="tab:red",
                 edgecolor="none",
             )
-        # plt.plot(np.linspace(0, 2355,2355), [-1 * i for i in np.concatenate(results_pid_network[i]['r_list']).tolist()], label = f'Pure-RL ({str(n_i)})')
+    
     plt.ylim(-100, 0)
     plt.xlim(0, 2355)
     plt.legend()
     plt.xlabel("Episode")
     plt.ylabel("Reward")
-    plt.savefig("network_size_analysis.pdf")
+    plt.savefig("lc_sp_newobs_0306.pdf")
     plt.show()
+
+
+

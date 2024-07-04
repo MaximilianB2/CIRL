@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from CS1_Model import reactor_class
+from cstr_model import reactor_class
 import torch
 import torch.nn.functional as F
 
@@ -159,23 +159,6 @@ def plot_simulation_comp(
     plt.rcParams["font.size"] = 20
     t = np.linspace(0, 25, ns)
     fig, axs = plt.subplots(1, 2, figsize=(20, 10))
-    labels = [
-        "$Cb_{k_p}$",
-        "$Cb_{k_i}$",
-        "$Cb_{k_d}$",
-        "$T_{k_p}$",
-        "$T_{k_i}$",
-        "$T_{k_d}$",
-    ]
-    col = ["tab:orange", "tab:red", "tab:blue", "tab:orange", "tab:red", "tab:blue"]
-    col_fill = [
-        "tab:orange",
-        "tab:red",
-        "tab:blue",
-        "tab:orange",
-        "tab:red",
-        "tab:blue",
-    ]
     Ca_des = SP[0]
     V_des = SP[1]
     axs[0].plot(t, np.median(Ca_dat_PG, axis=1), color="tab:red", lw=1, label="RL")
@@ -187,8 +170,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Static PID",
     )
-    # axs[0].plot(t,np.median(Ca_eval_normRL_PG,axis=1), color = 'tab:green', lw=1.5, label = 'RL (PG)')
-    # axs[0].plot(t,np.median(Ca_dat_GS,axis=1), color = 'tab:orange', lw=1.5, label = 'Offline GS')
+
     axs[0].fill_between(
         t,
         np.min(Ca_dat_PG, axis=1),
@@ -206,7 +188,6 @@ def plot_simulation_comp(
         edgecolor="none",
     )
 
-    # axs[0].fill_between(t, np.min(Ca_eval_normRL_PG,axis=1), np.max(Ca_eval_normRL_PG,axis=1),color = 'tab:green', alpha=0.2,edgecolor  = 'none')
     axs[0].fill_between(
         t,
         np.min(Ca_eval_PID_const, axis=1),
@@ -219,31 +200,9 @@ def plot_simulation_comp(
         t, Ca_des, "--", lw=1.5, color="black", zorder=1, alpha=0.8, label="Setpoint"
     )
 
-    # # Create a set of inset Axes: these should fill the bounding box allocated to them.
-    # ax1_inset = inset_axes(axs[0], width="30%", height="30%", loc=2)
-    # ax1_inset.plot(t, np.median(Ca_dat_PG,axis=1), color = 'tab:red', lw=1)
-    # ax1_inset.plot(t,np.median(Ca_dat_EA,axis=1), color = 'tab:blue', lw=1.5)
-    # ax1_inset.plot(t,np.median(Ca_eval_PID_const,axis=1), color = 'tab:orange', lw=1.5)
-    # ax1_inset.step(t, Ca_des, '--', lw=1.5, color='black')
-    # ax1_inset.set_xlim(16, 21)
-    # ax1_inset.set_ylim(0.65, 0.8)
-    # ax1_inset.set_xticklabels([])
-    # ax1_inset.set_yticklabels([])
-    # xyA_1 = (16, 0.8)
-    # xyB = (0, 0)
-    # coordsA = "data"
-    # coordsB = "axes fraction"
-    # con = ConnectionPatch(xyA=xyA_1, xyB=xyB, coordsA=coordsA, coordsB=coordsB, axesA=axs[0], axesB=ax1_inset)
-    # axs[0].add_artist(con)
-
-    # xyA = (21, max(np.median(Ca_dat_PG,axis=1)))
-    # xyB = (1, 1)
-    # con = ConnectionPatch(xyA=xyA, xyB=xyB, coordsA=coordsA, coordsB=coordsB, axesA=axs[0], axesB=ax1_inset)
-    # axs[0].add_artist(con)
     axs[0].set_ylabel("Concentration of B, $C_B$ (mol/m$^3$)")
     axs[0].set_xlabel("Time (min)")
 
-    # axs[0].legend(loc='lower right')
     axs[0].set_xlim(min(t), max(t))
 
     axs[0].grid(True, alpha=0.5)
@@ -251,7 +210,7 @@ def plot_simulation_comp(
 
     axs[1].plot(t, np.median(V_eval_PG, axis=1), color="tab:red", lw=1, label="RL ")
     axs[1].plot(t, np.median(V_eval_EA, axis=1), color="tab:blue", lw=1, label="CIRL ")
-    # axs[1].plot(t, np.median(V_eval_normRL_PG, axis=1), color = 'tab:green', lw=1, label = 'RL (PG)')
+
     axs[1].plot(
         t,
         np.median(V_eval_PID_const, axis=1),
@@ -275,7 +234,7 @@ def plot_simulation_comp(
         alpha=0.2,
         edgecolor="none",
     )
-    # axs[1].fill_between(t, np.min(V_eval_normRL_PG,axis=1), np.max(V_eval_normRL_PG,axis=1),color = 'tab:green', alpha=0.2,edgecolor  = 'none')
+
     axs[1].fill_between(
         t,
         np.min(V_eval_PID_const, axis=1),
@@ -298,77 +257,72 @@ def plot_simulation_comp(
     )
     axs[1].grid(True, alpha=0.5)
     axs[1].set_xlim(min(t), max(t))
-    # axs[1].set_ylim(95,110)
     plt.subplots_adjust(wspace=0.3)
     plt.savefig("cs1_presentation.pdf")
     plt.show()
 
+if __name__ == '__main__':
+    env = reactor_class(test=True, ns=120, PID_vel=True, normRL=True)
+    best_policy_rl = Net(
+        n_fc1=128,
+        n_fc2=128,
+        activation=torch.nn.ReLU,
+        n_layers=1,
+        output_sz=2,
+        PID=True,
+        deterministic=True,
+    )
+    best_policy_rl.load_state_dict(torch.load("best_policy_rl_wnoise.pth"))
+    Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
+        env, best_policy_rl, PID=False, ES=True
+    )
 
-env = reactor_class(test=True, ns=120, PID_vel=True, normRL=True)
-best_policy_rl = Net(
-    n_fc1=128,
-    n_fc2=128,
-    activation=torch.nn.ReLU,
-    n_layers=1,
-    output_sz=2,
-    PID=True,
-    deterministic=True,
-)
-best_policy_rl.load_state_dict(torch.load("best_policy_rl_wnoise.pth"))
-Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
-    env, best_policy_rl, PID=False, ES=True
-)
 
+    env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
+    best_policy_pid = Net(
+        n_fc1=128,
+        n_fc2=128,
+        activation=torch.nn.ReLU,
+        n_layers=1,
+        output_sz=6,
+        PID=True,
+        deterministic=True,
+    )
+    best_policy_pid.load_state_dict(torch.load("best_policy_pid_wnoise.pth"))
+    Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
+        env, best_policy_pid, PID=True, ES=True
+    )
 
-env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
-best_policy_pid = Net(
-    n_fc1=128,
-    n_fc2=128,
-    activation=torch.nn.ReLU,
-    n_layers=1,
-    output_sz=6,
-    PID=True,
-    deterministic=True,
-)
-best_policy_pid.load_state_dict(torch.load("best_policy_pid_wnoise.pth"))
-Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
-    env, best_policy_pid, PID=True, ES=True
-)
+    env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
+    best_policy_const_PID = np.load("constant_gains.npy")
+    (
+        Ca_eval_PID_const,
+        T_eval_PID_const,
+        V_eval_PID_const,
+        Tc_eval_PID_const,
+        F_eval_PID_const,
+        ks_eval_pid_const,
+    ) = rollout(env, best_policy_const_PID, PID=True, PG=False)
 
-env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
-best_policy_const_PID = np.load("constant_gains.npy")
-(
-    Ca_eval_PID_const,
-    T_eval_PID_const,
-    V_eval_PID_const,
-    Tc_eval_PID_const,
-    F_eval_PID_const,
-    ks_eval_pid_const,
-) = rollout(env, best_policy_const_PID, PID=True, PG=False)
-
-# env = reactor_class(test = True, ns = 120, PID_vel= True, normRL=True)
-# best_policy_PG_normRL = SAC.load('SAC_normRL_1604.zip')
-# Ca_eval_normRL_PG,T_eval_normRL_PG,V_eval_normRL_PG,Tc_eval_normRL_PG,F_eval_normRL_PG = rollout(env,best_policy_PG_normRL,PID=False,PG=True)
-
-SP = env.test_SP
-plot_simulation_comp(
-    Ca_eval_RL,
-    T_eval_RL,
-    Tc_eval_RL,
-    Ca_eval_pid,
-    T_eval_pid,
-    Tc_eval_pid,
-    ks_eval_pid,
-    F_eval_pid,
-    F_eval_RL,
-    V_eval_pid,
-    V_eval_RL,
-    Ca_eval_PID_const,
-    T_eval_PID_const,
-    V_eval_PID_const,
-    Tc_eval_PID_const,
-    F_eval_PID_const,
-    ks_eval_pid_const,
-    SP,
-    ns,
-)
+    SP = env.test_SP
+    plot_simulation_comp(
+        Ca_eval_RL,
+        T_eval_RL,
+        Tc_eval_RL,
+        Ca_eval_pid,
+        T_eval_pid,
+        Tc_eval_pid,
+        ks_eval_pid,
+        F_eval_pid,
+        F_eval_RL,
+        V_eval_pid,
+        V_eval_RL,
+        Ca_eval_PID_const,
+        T_eval_PID_const,
+        V_eval_PID_const,
+        Tc_eval_PID_const,
+        F_eval_PID_const,
+        ks_eval_pid_const,
+        SP,
+        ns,
+    )
