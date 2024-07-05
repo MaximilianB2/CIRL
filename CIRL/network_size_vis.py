@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     reps = 5
     results_pid_network = []
     # Load network size analysis data
@@ -17,7 +17,6 @@ if __name__ == '__main__':
                 r_list_values.append(r)
         results_pid_network.append(r_list_values)
 
-
     median_net_i = []
     max_net_i = []
     min_net_i = []
@@ -29,26 +28,21 @@ if __name__ == '__main__':
         max_net_i.append(np.max(np.array(net_i), axis=0))
         min_net_i.append(np.min(np.array(net_i), axis=0))
 
-
-
-
     neurons = [16, 128]
     x_values = np.linspace(0, 2355, 2355)[::6]
     median_values_all = [median_net_i[i][::6] for i in range(len(median_net_i))]
     min_values_all = [min_net_i[i][::6] for i in range(len(min_net_i))]
     max_values_all = [max_net_i[i][::6] for i in range(len(max_net_i))]
 
-
     results_rl_network = []
     for i in range(reps):
-        with open(f"results_rl_network_rep_newobs_{i}.pkl", "rb") as f:
+        with open(f"..\\data\\results_rl_network_rep_newobs_{i}.pkl", "rb") as f:
             inter = pickle.load(f)
             r_list_values = []
             for d in range(len(inter)):
                 r = [-1 * i for i in np.concatenate(inter[d]["r_list"]).tolist()]
                 r_list_values.append(r)
         results_rl_network.append(r_list_values)
-
 
     median_net_i_rl = []
     max_net_i_rl = []
@@ -60,8 +54,6 @@ if __name__ == '__main__':
         median_net_i_rl.append(np.median(np.array(net_i_rl), axis=0))
         max_net_i_rl.append(np.max(np.array(net_i_rl), axis=0))
         min_net_i_rl.append(np.min(np.array(net_i_rl), axis=0))
-
-
 
     x_values = np.linspace(0, 2355, 468)
 
@@ -77,11 +69,17 @@ if __name__ == '__main__':
         for i in range(len(median_net_i))
     ]
     min_values_all = [
-        pd.Series(min_net_i[i]).rolling(window=window_size).mean()[::window_size].tolist()
+        pd.Series(min_net_i[i])
+        .rolling(window=window_size)
+        .mean()[::window_size]
+        .tolist()
         for i in range(len(min_net_i))
     ]
     max_values_all = [
-        pd.Series(max_net_i[i]).rolling(window=window_size).mean()[::window_size].tolist()
+        pd.Series(max_net_i[i])
+        .rolling(window=window_size)
+        .mean()[::window_size]
+        .tolist()
         for i in range(len(max_net_i))
     ]
 
@@ -146,5 +144,5 @@ if __name__ == '__main__':
     plt.legend()
     plt.xlabel("Episode")
     plt.ylabel("Reward")
-    plt.savefig("network_size_analysis.pdf")
+    plt.savefig("..\\plots\\network_size_analysis.pdf")
     plt.show()

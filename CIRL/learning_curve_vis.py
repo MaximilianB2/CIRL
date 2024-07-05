@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import pandas as pd
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     reps = 10
     results_pid_network = []
     for i in range(reps):
@@ -26,14 +26,11 @@ if __name__ == '__main__':
         max_net_i.append(np.max(np.array(net_i), axis=0))
         min_net_i.append(np.min(np.array(net_i), axis=0))
 
-
-
     neurons = [16, 128]
     x_values = np.linspace(0, 2355, 2355)[::6]
     median_values_all = [median_net_i[i][::6] for i in range(len(median_net_i))]
     min_values_all = [min_net_i[i][::6] for i in range(len(min_net_i))]
     max_values_all = [max_net_i[i][::6] for i in range(len(max_net_i))]
-
 
     results_rl_network = []
     for i in range(10):
@@ -44,7 +41,6 @@ if __name__ == '__main__':
                 r = [-1 * i for i in np.concatenate(inter[d]["r_list"]).tolist()]
                 r_list_values.append(r)
         results_rl_network.append(r_list_values)
-
 
     median_net_i_rl = []
     max_net_i_rl = []
@@ -57,15 +53,10 @@ if __name__ == '__main__':
         max_net_i_rl.append(np.max(np.array(net_i_rl), axis=0))
         min_net_i_rl.append(np.min(np.array(net_i_rl), axis=0))
 
-
-
-
     neurons = [16, 128]
     x_values = np.linspace(0, 2355, 468)
 
-
     window_size = 10  # Define the size of the sliding window
-
 
     median_values_all = [
         pd.Series(median_net_i[i])
@@ -75,11 +66,17 @@ if __name__ == '__main__':
         for i in range(len(median_net_i))
     ]
     min_values_all = [
-        pd.Series(min_net_i[i]).rolling(window=window_size).mean()[::window_size].tolist()
+        pd.Series(min_net_i[i])
+        .rolling(window=window_size)
+        .mean()[::window_size]
+        .tolist()
         for i in range(len(min_net_i))
     ]
     max_values_all = [
-        pd.Series(max_net_i[i]).rolling(window=window_size).mean()[::window_size].tolist()
+        pd.Series(max_net_i[i])
+        .rolling(window=window_size)
+        .mean()[::window_size]
+        .tolist()
         for i in range(len(max_net_i))
     ]
 
@@ -114,7 +111,10 @@ if __name__ == '__main__':
     for i, n_i in enumerate(neurons):
         if i == 0:
             plt.plot(
-                x_values, median_values_all[i], label=f"CIRL ({str(n_i)})", color="tab:blue"
+                x_values,
+                median_values_all[i],
+                label=f"CIRL ({str(n_i)})",
+                color="tab:blue",
             )
             plt.fill_between(
                 x_values,
@@ -126,7 +126,10 @@ if __name__ == '__main__':
             )
         if i == 1:
             plt.plot(
-                x_values, median_values_all_rl[i], label=f"RL ({str(n_i)})", color="tab:red"
+                x_values,
+                median_values_all_rl[i],
+                label=f"RL ({str(n_i)})",
+                color="tab:red",
             )
             plt.fill_between(
                 x_values,
@@ -136,14 +139,11 @@ if __name__ == '__main__':
                 color="tab:red",
                 edgecolor="none",
             )
-    
+
     plt.ylim(-100, 0)
     plt.xlim(0, 2355)
     plt.legend()
     plt.xlabel("Episode")
     plt.ylabel("Reward")
-    plt.savefig("lc_sp_newobs_0306.pdf")
+    plt.savefig("..\\plots\\lc_sp_newobs_0306.pdf")
     plt.show()
-
-
-

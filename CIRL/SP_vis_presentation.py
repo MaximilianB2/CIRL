@@ -261,7 +261,8 @@ def plot_simulation_comp(
     plt.savefig("cs1_presentation.pdf")
     plt.show()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     env = reactor_class(test=True, ns=120, PID_vel=True, normRL=True)
     best_policy_rl = Net(
         n_fc1=128,
@@ -272,11 +273,10 @@ if __name__ == '__main__':
         PID=True,
         deterministic=True,
     )
-    best_policy_rl.load_state_dict(torch.load("best_policy_rl_wnoise.pth"))
+    best_policy_rl.load_state_dict(torch.load("..\\data\\best_policy_rl.pth"))
     Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
         env, best_policy_rl, PID=False, ES=True
     )
-
 
     env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
     best_policy_pid = Net(
@@ -288,13 +288,13 @@ if __name__ == '__main__':
         PID=True,
         deterministic=True,
     )
-    best_policy_pid.load_state_dict(torch.load("best_policy_pid_wnoise.pth"))
+    best_policy_pid.load_state_dict(torch.load("..\\data\\best_policy_pid.pth"))
     Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
         env, best_policy_pid, PID=True, ES=True
     )
 
     env = reactor_class(test=True, ns=120, PID_vel=True, normRL=False)
-    best_policy_const_PID = np.load("constant_gains.npy")
+    best_policy_const_PID = np.load("..\\data\\constant_gains.npy")
     (
         Ca_eval_PID_const,
         T_eval_PID_const,

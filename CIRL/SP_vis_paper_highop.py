@@ -97,7 +97,9 @@ def rollout(env, best_policy, PID, PG=False, ES=False):
             try:
                 Ks_norm = ((a_policy + 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
             except Exception:
-                Ks_norm = ((a_policy.detach().numpy()+ 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
+                Ks_norm = ((a_policy.detach().numpy() + 1) / 2) * (
+                    x_norm[1] - x_norm[0]
+                ) + x_norm[0]
             ks_eval_EA[:, 0, r_i] = Ks_norm
         r_tot = 0
         for i in range(1, ns):
@@ -113,7 +115,9 @@ def rollout(env, best_policy, PID, PG=False, ES=False):
                 try:
                     Ks_norm = ((a_policy + 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
                 except Exception:
-                    Ks_norm = ((a_policy.detach().numpy()+ 1) / 2) * (x_norm[1] - x_norm[0]) + x_norm[0]
+                    Ks_norm = ((a_policy.detach().numpy() + 1) / 2) * (
+                        x_norm[1] - x_norm[0]
+                    ) + x_norm[0]
                 ks_eval_EA[:, i, r_i] = Ks_norm
             s_norm, r, done, info, _ = env.step(a_policy)
 
@@ -178,10 +182,21 @@ def plot_simulation_comp(
         "tab:blue",
     ]
     Ca_des = SP[0]
-  
 
-    axs[0].plot(t, np.median(Ca_dat_EA, axis=1), color="tab:cyan", lw=1.5, label="CIRL (Extended)")
-    axs[0].plot(t, np.median(Ca_eval_pid_lowop, axis=1), color="tab:blue", lw=1.5, label="CIRL (Initial)")
+    axs[0].plot(
+        t,
+        np.median(Ca_dat_EA, axis=1),
+        color="tab:cyan",
+        lw=1.5,
+        label="CIRL (Extended)",
+    )
+    axs[0].plot(
+        t,
+        np.median(Ca_eval_pid_lowop, axis=1),
+        color="tab:blue",
+        lw=1.5,
+        label="CIRL (Initial)",
+    )
     axs[0].plot(
         t,
         np.median(Ca_eval_PID_const, axis=1),
@@ -251,7 +266,7 @@ def plot_simulation_comp(
         lw=1,
         label="CIRL (Initial)",
     )
-  
+
     axs[1].step(
         t,
         np.median(Tc_eval_PID_const, axis=1),
@@ -298,9 +313,8 @@ def plot_simulation_comp(
         handletextpad=0.5,
     )
 
-
     plt.subplots_adjust(wspace=0.3)
-    plt.savefig("RLvsRLPID_states_highop.pdf")
+    plt.savefig("..\\plots\\RLvsRLPID_states_highop.pdf")
     plt.show()
 
     fig, axs = plt.subplots(1, 1, figsize=(8, 6))
@@ -316,7 +330,7 @@ def plot_simulation_comp(
         np.median(ks_eval_EA[0, :, :], axis=1),
         col[0],
         lw=1.5,
-        linestyle = 'dotted',
+        linestyle="dotted",
         label="CIRL (Extended) " + labels[0],
     )
     axs.step(
@@ -360,7 +374,7 @@ def plot_simulation_comp(
         np.median(ks_eval_EA[1, :, :], axis=1),
         col[1],
         lw=1.5,
-        linestyle = 'dotted',
+        linestyle="dotted",
         label="CIRL (Extended) " + labels[1],
     )
     axs.plot(
@@ -371,7 +385,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[1],
     )
-  
+
     axs.fill_between(
         t,
         np.min(ks_eval_EA[1, :, :], axis=1),
@@ -379,7 +393,6 @@ def plot_simulation_comp(
         color=col_fill[1],
         alpha=0.2,
     )
- 
 
     axs.plot(
         t,
@@ -393,7 +406,7 @@ def plot_simulation_comp(
         np.median(ks_eval_EA[2, :, :], axis=1),
         col[2],
         lw=1.5,
-        linestyle = 'dotted',
+        linestyle="dotted",
         label="CIRL (Extended) " + labels[2],
     )
     axs.plot(
@@ -404,7 +417,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[2],
     )
-   
+
     axs.fill_between(
         t,
         np.min(ks_eval_EA[2, :, :], axis=1),
@@ -430,88 +443,85 @@ def plot_simulation_comp(
         handletextpad=0.5,
     )
 
-   
     plt.tight_layout()
-    plt.savefig("RLvsRLPIDsp_PID_highop.pdf")
+    plt.savefig("..\\plots\\RLvsRLPIDsp_PID_highop.pdf")
     plt.show()
 
-if __name__ == '__main__':
-  env = reactor_class(test=True, ns=120, normRL=True)
-  best_policy_rl_sd = torch.load('best_policy_rl_highop.pth')
 
-  best_policy_pid_sd = torch.load('./data/best_policy_pid_highop.pth')
+if __name__ == "__main__":
+    env = reactor_class(test=True, ns=120, normRL=True)
 
+    best_policy_pid_sd = torch.load("..\\data\\best_policy_pid_highop.pth")
 
-  env = reactor_class(test=True, ns=120,  normRL=False)
-  best_policy_pid =cirl_net(
-      n_fc1=16,
-      n_fc2=16,
-      activation=torch.nn.ReLU,
-      n_layers=1,
-      output_sz=6,
-      input_sz=15,
-      PID=True,
-      deterministic=True,
-  )
-  best_policy_pid.load_state_dict(best_policy_pid_sd)
-  Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
-      env, best_policy_pid, PID=True, ES=True
-  )
-  best_policy_pid_sd_lowop = torch.load('./data/best_policy_pid_lowop.pth')
+    env = reactor_class(test=True, ns=120, normRL=False, highop=True)
+    best_policy_pid = cirl_net(
+        n_fc1=16,
+        n_fc2=16,
+        activation=torch.nn.ReLU,
+        n_layers=1,
+        output_sz=6,
+        input_sz=15,
+        PID=True,
+        deterministic=True,
+    )
+    best_policy_pid.load_state_dict(best_policy_pid_sd)
+    Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
+        env, best_policy_pid, PID=True, ES=True
+    )
+    best_policy_pid_sd_lowop = torch.load("..\\data\\best_policy_pid_lowop.pth")
 
+    env = reactor_class(test=True, ns=120, normRL=False, highop=True)
+    best_policy_pid = cirl_net(
+        n_fc1=16,
+        n_fc2=16,
+        activation=torch.nn.ReLU,
+        n_layers=1,
+        output_sz=6,
+        input_sz=15,
+        PID=True,
+        deterministic=True,
+    )
+    best_policy_pid.load_state_dict(best_policy_pid_sd_lowop)
+    (
+        Ca_eval_pid_lowop,
+        T_eval_pid_lowop,
+        V_eval_pid_lowop,
+        Tc_eval_pid_lowop,
+        F_eval_pid_lowop,
+        ks_eval_pid_lowop,
+    ) = rollout(env, best_policy_pid, PID=True, ES=True)
 
-  env = reactor_class(test=True, ns=120,  normRL=False)
-  best_policy_pid = cirl_net(
-      n_fc1=16,
-      n_fc2=16,
-      activation=torch.nn.ReLU,
-      n_layers=1,
-      output_sz=6,
-      input_sz=15,
+    env = reactor_class(test=True, ns=120, normRL=False, highop=True)
+    best_policy_const_PID = np.load("..\\data\\constant_gains_highop.npy")
+    (
+        Ca_eval_PID_const,
+        T_eval_PID_const,
+        V_eval_PID_const,
+        Tc_eval_PID_const,
+        F_eval_PID_const,
+        ks_eval_pid_const,
+    ) = rollout(env, best_policy_const_PID, PID=True, PG=False)
 
-      PID=True,
-      deterministic=True,
-  )
-  best_policy_pid.load_state_dict(best_policy_pid_sd_lowop)
-  Ca_eval_pid_lowop, T_eval_pid_lowop, V_eval_pid_lowop, Tc_eval_pid_lowop, F_eval_pid_lowop, ks_eval_pid_lowop = rollout(
-      env, best_policy_pid, PID=True, ES=True
-  )
-
-
-
-  env = reactor_class(test=True, ns=120,  normRL=False)
-  best_policy_const_PID = np.load("./data/constant_gains_highop.npy")
-  (
-      Ca_eval_PID_const,
-      T_eval_PID_const,
-      V_eval_PID_const,
-      Tc_eval_PID_const,
-      F_eval_PID_const,
-      ks_eval_pid_const,
-  ) = rollout(env, best_policy_const_PID, PID=True, PG=False)
-
-
-
-  SP = env.test_SP
-  plot_simulation_comp(
-      Ca_eval_pid,
-      T_eval_pid,
-      Tc_eval_pid,
-      ks_eval_pid,
-      F_eval_pid,
-      V_eval_pid,
-      Ca_eval_PID_const,
-      T_eval_PID_const,
-      V_eval_PID_const,
-      Tc_eval_PID_const,
-      F_eval_PID_const,
-      ks_eval_pid_const,
-      Ca_eval_pid_lowop,
-      T_eval_pid_lowop,
-      V_eval_pid_lowop,
-      Tc_eval_pid_lowop,
-      F_eval_pid_lowop,
-      ks_eval_pid_lowop,
-      SP,
-      ns,
-  )
+    SP = env.test_SP
+    plot_simulation_comp(
+        Ca_eval_pid,
+        T_eval_pid,
+        Tc_eval_pid,
+        ks_eval_pid,
+        F_eval_pid,
+        V_eval_pid,
+        Ca_eval_PID_const,
+        T_eval_PID_const,
+        V_eval_PID_const,
+        Tc_eval_PID_const,
+        F_eval_PID_const,
+        ks_eval_pid_const,
+        Ca_eval_pid_lowop,
+        T_eval_pid_lowop,
+        V_eval_pid_lowop,
+        Tc_eval_pid_lowop,
+        F_eval_pid_lowop,
+        ks_eval_pid_lowop,
+        SP,
+        ns,
+    )

@@ -3,13 +3,12 @@ import numpy as np
 from cstr_model import reactor_class
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     n = 100
     Tc_vec = np.linspace(290, 450, n)
     F_vec = np.linspace(99, 110, n)
     ns = 120
     env = reactor_class(test=True, ns=ns, DS=True)
-
 
     F_j = 100
     x_b_slice = np.zeros(n)
@@ -25,7 +24,6 @@ if __name__ == '__main__':
             )
         x_b_slice[i] = env.state[1]
         x_b_slice[x_b_slice < 0] = 0
-
 
     SP1 = [0.7, 0.75, 0.8]
     SP2 = [0.4, 0.5, 0.6]
@@ -72,8 +70,12 @@ if __name__ == '__main__':
         alpha=0.2,
     )
     plt.plot(Tc_vec, x_b_slice, color="tab:blue", zorder=2)
-    y_min = [x_b_slice[np.argmin(np.abs(x_b_slice - sp))] for sp in [min(SP1 + SP2 + SP3)]]
-    y_max = [x_b_slice[np.argmin(np.abs(x_b_slice - sp))] for sp in [max(SP1 + SP2 + SP3)]]
+    y_min = [
+        x_b_slice[np.argmin(np.abs(x_b_slice - sp))] for sp in [min(SP1 + SP2 + SP3)]
+    ]
+    y_max = [
+        x_b_slice[np.argmin(np.abs(x_b_slice - sp))] for sp in [max(SP1 + SP2 + SP3)]
+    ]
 
     # Fill the area between the lowest and highest set points
     plt.fill_between(
@@ -108,5 +110,5 @@ if __name__ == '__main__':
         handletextpad=0.5,
     )
 
-    plt.savefig("CS1_ds_training.pdf")
+    plt.savefig("..\\plots\\CS1_ds_training.pdf")
     plt.show()

@@ -193,8 +193,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Static PID",
     )
-    # axs[0].plot(t,np.median(Ca_eval_normRL_PG,axis=1), color = 'tab:green', lw=1.5, label = 'RL (PG)')
-    # axs[0].plot(t,np.median(Ca_dat_GS,axis=1), color = 'tab:orange', lw=1.5, label = 'Offline GS')
+
     axs[0].fill_between(
         t,
         np.min(Ca_dat_PG, axis=1),
@@ -212,7 +211,6 @@ def plot_simulation_comp(
         edgecolor="none",
     )
 
-    # axs[0].fill_between(t, np.min(Ca_eval_normRL_PG,axis=1), np.max(Ca_eval_normRL_PG,axis=1),color = 'tab:green', alpha=0.2,edgecolor  = 'none')
     axs[0].fill_between(
         t,
         np.min(Ca_eval_PID_const, axis=1),
@@ -237,27 +235,9 @@ def plot_simulation_comp(
     axs[0].grid(True, alpha=0.5)
     axs[0].set_axisbelow(True)
     axs[0].set_xlabel("Time (min)")
-    # axs[0].set_ylim(0.6,1)
-
-    # axs[1].plot(t, np.median(T_dat_PG,axis=1), color = 'tab:red', lw=1,label = 'RL ')
-    # axs[1].plot(t,np.median(T_dat_EA,axis=1), color = 'tab:blue', lw=1.5, label = 'CIRL')
-    # # axs[1].plot(t,np.median(T_eval_normRL_PG,axis=1), color = 'tab:green', lw=1.5, label = 'RL (PG)')
-    # # axs[1].plot(t,np.median(T_eval_PID_PG,axis=1), color = 'tab:orange', lw=1.5, label = 'CIRL(PG)')
-    # axs[1].fill_between(t, np.min(T_dat_PG,axis=1), np.max(T_dat_PG,axis=1),color = 'tab:red', alpha=0.1,edgecolor  = 'none')
-    # axs[1].fill_between(t, np.min(T_dat_EA,axis=1), np.max(T_dat_EA,axis=1),color = 'tab:blue', alpha=0.2,edgecolor  = 'none')
-    # # axs[1].fill_between(t, np.min(T_eval_normRL_PG,axis=1), np.max(T_eval_normRL_PG,axis=1),color = 'tab:green', alpha=0.2,edgecolor  = 'none')
-    # # axs[1].fill_between(t, np.min(T_eval_PID_PG,axis=1), np.max(T_eval_PID_PG,axis=1),color = 'tab:orange', alpha=0.2,edgecolor  = 'none')
-    # axs[1].set_ylabel('Reactor Temperature, $T$ (K)')
-    # axs[1].set_xlabel('Time (min)')
-    # axs[1].legend(loc='lower right')
-    # axs[1].set_xlim(min(t), max(t))
-    # axs[1].grid(True, alpha = 0.5)
-    # axs[1].set_axisbelow(True)
-    # # axs[1].set_ylim(325,340)
-
     axs[1].plot(t, np.median(V_eval_PG, axis=1), color="tab:red", lw=1, label="RL ")
     axs[1].plot(t, np.median(V_eval_EA, axis=1), color="tab:blue", lw=1, label="CIRL")
-    # axs[1].plot(t, np.median(V_eval_normRL_PG, axis=1), color = 'tab:green', lw=1, label = 'RL (PG)')
+
     axs[1].plot(
         t,
         np.median(V_eval_PID_const, axis=1),
@@ -281,7 +261,7 @@ def plot_simulation_comp(
         alpha=0.2,
         edgecolor="none",
     )
-    # axs[1].fill_between(t, np.min(V_eval_normRL_PG,axis=1), np.max(V_eval_normRL_PG,axis=1),color = 'tab:green', alpha=0.2,edgecolor  = 'none')
+
     axs[1].fill_between(
         t,
         np.min(V_eval_PID_const, axis=1),
@@ -292,11 +272,8 @@ def plot_simulation_comp(
     )
     axs[1].step(t, V_des, "--", lw=1.5, color="black")
     axs[1].set_ylabel("Volume, $V$ (m$^3$)")
-
-    # axs[1].legend(loc='best')
     axs[1].grid(True, alpha=0.5)
     axs[1].set_xlim(min(t), max(t))
-    # axs[1].set_ylim(95,110)
     axs[1].set_xlabel("Time (min)")
     axs[2].step(
         t,
@@ -316,7 +293,7 @@ def plot_simulation_comp(
         lw=1,
         label="CIRL",
     )
-    # axs[2].step(t, np.median(Tc_eval_normRL_PG,axis=1), color = 'tab:green', linestyle = 'dashed', where= 'post',lw=1, label = 'RL (PG)')
+
     axs[2].step(
         t,
         np.median(Tc_eval_PID_const, axis=1),
@@ -351,7 +328,7 @@ def plot_simulation_comp(
     axs[2].set_axisbelow(True)
     axs[2].set_ylabel("Cooling Temperature, $T_c$ (K)")
     axs[2].set_xlabel("Time (min)")
-    # axs[2].legend(loc='best')
+
     axs[2].set_xlim(min(t), max(t))
     axs[2].legend(
         bbox_to_anchor=(1.1, 1.0),
@@ -394,7 +371,7 @@ def plot_simulation_comp(
         color="tab:red",
         alpha=0.2,
     )
-    # axs[3].step(t, np.median(F_eval_normRL_PG,axis=1), color = 'tab:green', linestyle = 'dashed', where= 'post',lw=1, label = 'RL (PG)')
+
     axs[3].step(
         t,
         np.median(F_eval_PID_const, axis=1),
@@ -415,9 +392,8 @@ def plot_simulation_comp(
     axs[3].set_xlim(min(t), max(t))
     axs[3].set_ylabel("Flowrate in, $F_{in}$ (m$^3$/s)")
     axs[3].set_xlabel("Time (min)")
-    # axs[3].legend(loc='best')
     plt.subplots_adjust(wspace=0.3)
-    plt.savefig("RLvsRLPID_states.pdf")
+    plt.savefig("..\\plots\\RLvsRLPID_states.pdf")
     plt.show()
 
     fig, axs = plt.subplots(1, 2, figsize=(12, 5))
@@ -436,7 +412,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[0],
     )
-    # axs[0].step(t, np.median(ks_eval_GS[0,:,:],axis=1), col[0],linestyle = 'dashed', lw=1.5,label = 'GS ' + labels[0])
+
     axs[0].fill_between(
         t,
         np.min(ks_eval_EA[0, :, :], axis=1),
@@ -465,7 +441,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[1],
     )
-    # axs[0][1].step(t, np.median(ks_eval_GS[1,:,:],axis=1), col[1],linestyle = 'dashed', lw=1.5, label = 'GS ' + labels[1])
+
     axs[0].fill_between(
         t,
         np.min(ks_eval_EA[1, :, :], axis=1),
@@ -473,12 +449,6 @@ def plot_simulation_comp(
         color=col_fill[1],
         alpha=0.2,
     )
-    # axs[0][1].set_ylabel('$C_B$-loop $K_i$')
-    # axs[0][1].set_xlabel('Time (min)')
-    # axs[0][1].legend(loc='upper left')
-    # axs[0][1].set_xlim(min(t), max(t))
-    # axs[0][1].grid(True, alpha = 0.5)
-    # axs[0][1].set_axisbelow(True)
 
     axs[0].plot(
         t,
@@ -495,7 +465,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[2],
     )
-    # axs[0][2].step(t, np.median(ks_eval_GS[2,:,:],axis=1), col[2],linestyle = 'dashed',where = 'post', lw=1.5, label = 'GS ' + labels[2])
+
     axs[0].fill_between(
         t,
         np.min(ks_eval_EA[2, :, :], axis=1),
@@ -503,12 +473,7 @@ def plot_simulation_comp(
         color=col_fill[2],
         alpha=0.2,
     )
-    # axs[0][2].set_ylabel('$C_B$-loop $K_d$')
-    # axs[0][2].set_xlabel('Time (min)')
-    # axs[0][2].legend(loc='best')
-    # axs[0][2].set_xlim(min(t), max(t))
-    # axs[0][2].grid(True, alpha = 0.5)
-    # axs[0][2].set_axisbelow(True)
+
     axs[0].legend(
         bbox_to_anchor=(1.1, 1.0),
         loc="lower center",
@@ -533,7 +498,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[0],
     )
-    # axs[1].step(t, np.median(ks_eval_GS[0,:,:],axis=1), col[0],linestyle = 'dashed', lw=1.5,label = 'GS ' + labels[0])
+
     axs[1].fill_between(
         t,
         np.min(ks_eval_EA[3, :, :], axis=1),
@@ -563,7 +528,7 @@ def plot_simulation_comp(
         lw=1.5,
         label="Constant " + labels[1],
     )
-    # axs[1][1].step(t, np.median(ks_eval_GS[1,:,:],axis=1), col[1],linestyle = 'dashed', lw=1.5, label = 'GS ' + labels[1])
+
     axs[1].fill_between(
         t,
         np.min(ks_eval_EA[4, :, :], axis=1),
@@ -571,12 +536,6 @@ def plot_simulation_comp(
         color=col_fill[1],
         alpha=0.2,
     )
-    # axs[1][1].set_ylabel('$V$-loop $K_i$')
-    # axs[1][1].set_xlabel('Time (min)')
-    # axs[1][1].legend(loc='upper left')
-    # axs[1][1].set_xlim(min(t), max(t))
-    # axs[1][1].grid(True, alpha = 0.5)
-    # axs[1][1].set_axisbelow(True)
 
     axs[1].plot(
         t,
@@ -608,13 +567,13 @@ def plot_simulation_comp(
     # axs[2].set_xlim(min(t), max(t))
     # axs[2].grid(True, alpha = 0.5)
     # axs[2].set_axisbelow(True)
-    plt.savefig("RLvsRLPIDsp_PID.pdf")
+    plt.savefig("..\\plots\\RLvsRLPIDsp_PID.pdf")
     plt.show()
 
 
 env = reactor_class(test=True, ns=120, normRL=True)
 # best_policy_rl_sd = torch.load("best_policy_rl.pth")
-with open("./data/results_rl_network_rep_newobs_0.pkl", "rb") as f:
+with open("..\\data\\results_rl_network_rep_newobs_0.pkl", "rb") as f:
     inter = pickle.load(f)
     # print(len(inter[4]['p_list']))
     best_policy_rl_sd = inter[1]["p_list"][149]
@@ -633,7 +592,7 @@ Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
     env, best_policy_rl, PID=False, ES=True
 )
 # best_policy_pid_sd = torch.load('best_policy_pid_unstable.pth')
-with open("./data/results_pid_network_rep_newobs_1.pkl", "rb") as f:
+with open("..\\data\\results_pid_network_rep_newobs_1.pkl", "rb") as f:
     inter = pickle.load(f)
     best_policy_pid_sd = inter[0]["p_list"][149]
 
@@ -654,7 +613,7 @@ Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = roll
 )
 
 env = reactor_class(test=True, ns=120, normRL=False)
-best_policy_const_PID = np.load("./data/constant_gains.npy")
+best_policy_const_PID = np.load("..\\data\\constant_gains.npy")
 (
     Ca_eval_PID_const,
     T_eval_PID_const,

@@ -177,7 +177,7 @@ class CIRLTraining:
             )
             r_list_cirl.append(r_cirl)
             p_list_cirl.append(p_cirl)
-            torch.save(best_policy_cirl.state_dict(), f"best_policy_pid_{_}.pth")
+            torch.save(best_policy_cirl.state_dict(), f"best_policy_pid_highop_{_}.pth")
 
         # Save rewards and policies
         with open("r_pid_highop.pkl", "wb") as f:

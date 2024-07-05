@@ -1,8 +1,5 @@
 import torch
-import torch.nn.functional as F
 from cstr_model import reactor_class
-from torch_pso import ParticleSwarmOptimizer
-import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from cirl_policy import Net as cirl_net
@@ -189,7 +186,8 @@ def plot_simulation_comp(
     plt.show()
     plt.show()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     env = reactor_class(test=True, ns=120, normRL=True, dist=True)
     best_policy_rl = cirl_net(
         n_fc1=128,
@@ -205,7 +203,6 @@ if __name__ == '__main__':
     Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
         env, best_policy_rl, PID=False
     )
-
 
     env = reactor_class(test=True, ns=120, normRL=False, dist=True)
     best_policy_pid = cirl_net(
