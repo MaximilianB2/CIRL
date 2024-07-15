@@ -425,7 +425,6 @@ class reactor_class(gym.Env):
                 self.Caf = self.Caf_dist[self.SP_i]
             else:
                 self.Caf = 1.75
-
         y = odeint(cstr_CS1, state[0:5], self.ts, args=(u, self.Tf, self.Caf))
 
         # add measurement noise
