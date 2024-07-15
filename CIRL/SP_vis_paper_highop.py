@@ -4,7 +4,7 @@ from cstr_model import reactor_class
 import torch
 import torch.nn.functional as F
 from cirl_policy import Net as cirl_net
-
+import pickle
 ns = 120
 reps = 10
 
@@ -30,7 +30,7 @@ class Net(torch.nn.Module):
         self.use_cuda = torch.cuda.is_available()
         self.device = torch.device("cpu")
         self.pid = PID
-        self.input_size = 8  # State size: Ca, T,Ca-,T- , Ca setpoint
+        self.input_size = 15  # State size: Ca, T,Ca-,T- , Ca setpoint
         self.output_sz = output_sz  # Output size: Reactor Ks size
         self.n_layers = torch.nn.ModuleList()
         self.hs1 = n_fc1  # !! parameters
@@ -64,7 +64,6 @@ class Net(torch.nn.Module):
             y = y.detach().numpy()
 
         return y
-
 
 def rollout(env, best_policy, PID, PG=False, ES=False):
     Ca_eval_EA = np.zeros((ns, reps))
@@ -449,9 +448,9 @@ def plot_simulation_comp(
 
 
 if __name__ == "__main__":
-    env = reactor_class(test=True, ns=120, normRL=True)
+    env = reactor_class(test=True, ns=120, normRL=True, highop=True)
 
-    best_policy_pid_sd = torch.load("..\\data\\best_policy_pid_highop.pth")
+    best_policy_pid_sd = torch.load("..\\data\\best_policy_pid_highop_0.pth")
 
     env = reactor_class(test=True, ns=120, normRL=False, highop=True)
     best_policy_pid = cirl_net(
@@ -468,16 +467,18 @@ if __name__ == "__main__":
     Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
         env, best_policy_pid, PID=True, ES=True
     )
-    best_policy_pid_sd_lowop = torch.load("..\\data\\best_policy_pid_lowop.pth")
+    with open("..\\data\\results_pid_network_rep_newobs_1.pkl", "rb") as f:
+        inter = pickle.load(f)
+        best_policy_pid_sd_lowop = inter[0]["p_list"][149]
 
     env = reactor_class(test=True, ns=120, normRL=False, highop=True)
-    best_policy_pid = cirl_net(
+    best_policy_pid = Net(
         n_fc1=16,
         n_fc2=16,
         activation=torch.nn.ReLU,
         n_layers=1,
         output_sz=6,
-        input_sz=15,
+        # input_sz=15,
         PID=True,
         deterministic=True,
     )

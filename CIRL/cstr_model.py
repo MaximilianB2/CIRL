@@ -186,18 +186,18 @@ class reactor_class(gym.Env):
 
         # Obs and action spaces
         self.x_norm = np.array(
-            (
-                [
-                    0,
-                    0,
-                    0.01,
-                    0,
-                    0,
-                    0.01,
-                ],
-                [25, 20, 10, 1, 2, 1],
-            )
+        (
+            [
+                -5, 
+                0,
+                0.01,
+                0,
+                0,
+                0.01,
+            ],
+            [25, 20, 10, 1, 2, 1],
         )
+    )      
         # self.x_norm = np.array(([-5,0,0.01,-1,0,0.01,],[25,20,10,1,2,1])) # PID space
         self.observation_space = spaces.Box(
             low=np.array([0, 350, 90, 0, 350, 90, 0, 350, 90, 0, 99, 0, 99, 0, 99]),

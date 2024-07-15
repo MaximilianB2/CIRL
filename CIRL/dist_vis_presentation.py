@@ -199,7 +199,7 @@ if __name__ == "__main__":
         deterministic=True,
         PID=True,
     )
-    best_policy_rl.load_state_dict(torch.load("./data/best_policy_rl_dist.pth"))
+    best_policy_rl.load_state_dict(torch.load("..//data//best_policy_rl_dist.pth"))
     Ca_eval_RL, T_eval_RL, V_eval_RL, Tc_eval_RL, F_eval_RL = rollout(
         env, best_policy_rl, PID=False
     )
@@ -215,7 +215,7 @@ if __name__ == "__main__":
         deterministic=True,
         PID=True,
     )
-    best_policy_pid.load_state_dict(torch.load("./data/best_policy_pid_dist.pth"))
+    best_policy_pid.load_state_dict(torch.load("..//data//best_policy_pid_dist_0.pth"))
     Ca_eval_pid, T_eval_pid, V_eval_pid, Tc_eval_pid, F_eval_pid, ks_eval_pid = rollout(
         env, best_policy_pid, PID=True
     )

@@ -38,13 +38,13 @@ class CIRLTraining:
                 if done:
                     break
             ret[i] = rew
-            r_tot = np.mean(ret)
-            global r_list
-            global p_list
-            global r_list_i
-            r_list.append(r_tot)
-            r_list_i.append(r_tot)
-            p_list.append(policy)
+        r_tot = np.mean(ret)
+        global r_list
+        global p_list
+        global r_list_i
+        r_list.append(r_tot)
+        r_list_i.append(r_tot)
+        p_list.append(policy)
         return np.mean(ret)
 
     def training_loop(self, PID, dist_train, n_fc, highop=False):
@@ -200,7 +200,7 @@ class CIRLTraining:
             )
             r_list_cirl.append(r_cirl)
             p_list_cirl.append(p_cirl)
-            torch.save(best_policy_cirl.state_dict(), f"best_policy_pid_{_}.pth")
+            torch.save(best_policy_cirl.state_dict(), f"best_policy_pid_dist_{_}.pth")
 
             # RL
             best_policy_rl, r_rl, p_rl = self.training_loop(
@@ -209,7 +209,7 @@ class CIRLTraining:
             r_list_rl.append(r_rl)
             p_list_rl.append(p_rl)
 
-            torch.save(best_policy_rl.state_dict(), f"best_policy_rl_{_}.pth")
+            torch.save(best_policy_rl.state_dict(), f"best_policy_rl_dist_{_}.pth")
 
         # Save rewards and policies
         with open("r_pid_dist_nonobs.pkl", "wb") as f:

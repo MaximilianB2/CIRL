@@ -5,7 +5,7 @@ from scipy.optimize import differential_evolution
 # Global variables for the simulation
 ns = 120 * 3
 reps = 1  # Number of repetitions for the simulation
-env = reactor_class(test=False, ns=ns)  # Environment instance
+env = reactor_class(test=True, ns=ns)  # Environment instance
 
 
 def initialize_evaluation_matrices(ns, reps):
@@ -91,10 +91,8 @@ if __name__ == "__main__":
     # Perform differential evolution to find the optimal PID gains
     result_vel = differential_evolution(
         rollout,
-        polish=False,
-        popsize=3,
         bounds=bounds,
-        args=(3, env, ns),
+        args=(1, env, ns),
         maxiter=150,
         disp=True,
     )
